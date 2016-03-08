@@ -5,7 +5,7 @@ import {makeKey} from "./keys";
 
 import {
 	DEFAULT_TTL,
-	DEFAULT_TTR,
+	DEFAULT_TTR_RATIO,
 } from "./constants";
 
 const CACHES = {};
@@ -28,7 +28,7 @@ export default function wrap(opts, func){
 	const {
 		name,
 		ttl     = DEFAULT_TTL,
-		ttr     = DEFAULT_TTR,
+		ttr     = ttl * DEFAULT_TTR_RATIO,
 		layers  = [],
 		before  = _ => Q(_),   // Munge arguments.
 		after   = _ => Q(_),   // Munge response.
