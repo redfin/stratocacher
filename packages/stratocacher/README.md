@@ -2,29 +2,29 @@
 
 A cache with pluggable layers.
 
-# Key features
+## Key features
 
-## Pluggable layers
+### Pluggable layers
 
 Want to cache in memcached with a small in-memory LRU cache for hot values?
 
 No problem!  Stratocacher supports pluggable layers, and creating new layers is easy!
 
-## Automatic key generation
+### Automatic key generation
 
 Stratocacher works on any function that:
 - Is _named_ (e.g. `function foo()`)
 - Takes only string and number arguments
 - Returns a JSON-serializable value or a _promise_ of a JSON-serializable value.
 
-## Background rebuild
+### Background rebuild
 
 Stratocacher supports separate time-to-live and time-to-rebuild.
 
 If a request comes in between `ttr` and `ttl` then a _background_ rebuild will
 kick off and update the cache.  No miss!
 
-# Usage
+## Usage
 
 ```javascript
 
@@ -39,6 +39,7 @@ const getFoo = stratocacher.wrap({
 }, function getFoo(a, b, c) {
 	return promiseOfSomethingExpensive(a, b, c);
 });
+```
 
 ## wrap options
 
