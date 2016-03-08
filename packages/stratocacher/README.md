@@ -56,3 +56,7 @@ Time to live for cache values.
 ### ttr
 
 Time to _rebuild_ for cache values.
+
+### layers
+
+An array of layer _classes_.  Layers are checked in order, earlier layers first.
