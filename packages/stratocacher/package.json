@@ -1,7 +1,7 @@
 {
   "name": "stratocacher",
   "version": "0.0.0",
-  "description": "A promise cache with pluggable layers",
+  "description": "A cache with pluggable layers",
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp prepublish",
