@@ -6,7 +6,7 @@ import Q from "q";
 //  * It caches by _reference_!
 //  * In _never_ evicts!
 const CACHE = {};
-export default class LayerObject extends Layer {
+export default class LayerSimpleObject extends Layer {
 
 	get() {
 		return Q(this.load(CACHE[this.key]));

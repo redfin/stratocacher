@@ -1,4 +1,4 @@
-# LayerObject
+# LayerSimpleObject
 
 A simple cache layer for stratocacher.
 

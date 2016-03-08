@@ -1,5 +1,5 @@
 {
-  "name": "stratocacher-layer-object",
+  "name": "stratocacher-layer-simple-object",
   "version": "0.0.0",
   "description": "A simple by-reference cache layer with no eviction",
   "main": "index.js",
