@@ -1,0 +1,28 @@
+{
+  "name": "stratocacher-layer-object",
+  "version": "0.0.0",
+  "description": "A simple by-reference cache layer with no eviction",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redfin/stratocacher.git"
+  },
+  "keywords": [
+    "stratocacher",
+    "cache",
+    "layer"
+  ],
+  "author": "Bo Borgerson",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/redfin/stratocacher/issues"
+  },
+  "homepage": "https://github.com/redfin/stratocacher#readme",
+  "dependencies": {
+    "q": "^1.4.1"
+  }
+}

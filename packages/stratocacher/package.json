@@ -1,0 +1,30 @@
+{
+  "name": "stratocacher",
+  "version": "0.0.0",
+  "description": "A promise cache with pluggable layers",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redfin/stratocacher.git"
+  },
+  "keywords": [
+    "cache",
+    "layers",
+    "pluggable",
+    "promise"
+  ],
+  "author": "Bo Borgerson",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/redfin/stratocacher/issues"
+  },
+  "homepage": "https://github.com/redfin/stratocacher#readme",
+  "dependencies": {
+    "lodash": "^4.6.1",
+    "q": "^1.4.1"
+  }
+}
