@@ -24,6 +24,22 @@ describe("The registry", () => {
 		expect(add).toThrowError("Registry collision!");
 	});
 
+	it("won't unregister until unwrapped", () => {
+		const add = () => {
+			Registry.add('A', {
+				unwrap    : () => true, // Should .del()
+				isWrapped : () => true,
+			});
+		}
+		const del = () => {
+			Registry.del('A');
+		}
+
+		expect(add).not.toThrow();
+		expect(del).toThrowError("Must unwrap to unregister!");
+		expect(Registry.clear).toThrowError("A non-cache snuck in!");
+	});
+
 	it("really doesn't like non-caches", () => {
 		const add = () => {
 			Registry.add('A', {

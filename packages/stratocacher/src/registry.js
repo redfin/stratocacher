@@ -29,7 +29,13 @@ export default class Registry {
 	// Really just for testing.
 	// Unwraps all wrapped functions and clears the registry.
 	static clear() {
-		_.forEach(CACHES, cache => cache.unwrap());
+		_.forEach(CACHES, cache => {
+			try {
+				cache.unwrap()
+			} catch (e) {
+				// Pass.  We'll carp about it later.
+			}
+		});
 		const remaining = Object.keys(CACHES);
 		if (remaining.length) {
 			remaining.forEach(k => delete CACHES[k]);
