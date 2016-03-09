@@ -4,10 +4,10 @@
 
 ## Read about
 
-- [Stratocacher](packages/stratocacher/README.md).
+- [Stratocacher](packages/stratocacher/README.md)
 - Available layers:
     - [LayerSimpleObject](packages/stratocacher-layer-simple-object/README.md)
-- [Contributing](CONTRIBUTING.md).
+- [Contributing](CONTRIBUTING.md)
 
 [build-badge-img]: https://travis-ci.org/redfin/stratocacher.png?branch=master
 [build-url]: https://travis-ci.org/redfin/stratocacher
