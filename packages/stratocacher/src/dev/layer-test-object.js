@@ -5,7 +5,7 @@ import _     from "lodash";
 const CACHE = {};
 export default class LayerTestObject extends Layer {
 	static reset() {
-		_.forEach(CACHE, k => delete CACHE[k]);
+		_.forEach(CACHE, (v, k) => delete CACHE[k])
 	}
 
 	get() {

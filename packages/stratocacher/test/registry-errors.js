@@ -2,7 +2,7 @@ const Registry = require('../lib/registry').default;
 
 describe("The registry", () => {
 
-	beforeEach(() => {
+	afterEach(() => {
 		Registry.clear();
 	});
 

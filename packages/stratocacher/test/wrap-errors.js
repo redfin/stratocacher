@@ -3,7 +3,7 @@ const Registry = require('../lib/registry').default;
 
 describe("The wrap function", () => {
 
-	beforeEach(() => {
+	afterEach(() => {
 		Registry.clear();
 	});
 
