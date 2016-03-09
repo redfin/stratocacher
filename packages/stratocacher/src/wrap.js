@@ -134,7 +134,7 @@ export default function wrap(opts, func){
 			.then(after)
 
 			// Down and to the right!
-			.then(() => time('overall', new Date - _t0))
+			.then(v => (time('overall', new Date - _t0), v))
 	}
 
 	let unwrapped = false;
