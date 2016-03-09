@@ -141,8 +141,20 @@ export default function wrap(opts, func){
 
 	return function() {
 		const _t0 = new Date;
-		return Q(Array.from(arguments))
+		const ret = Q.defer();
+		const run = args => lookup.call(this, _t0, args)
+			.then(v => ret.resolve(v))
+			.catch(e => ret.reject(e))
+
+		Q(Array.from(arguments))
 			.then(before)
-			.then(args => lookup.call(this, _t0, args))
+			.then(run, err => {
+				// If the `before` hook fails, we'll proceed
+				// with caching disabled.
+				events.emit('error', err);
+				run([null]);
+			})
+
+		return ret.promise;
 	}
 }
