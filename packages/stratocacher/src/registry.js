@@ -1,4 +1,5 @@
 import _ from "lodash";
+import isCache from "./is-cache";
 
 const CACHES = {}
 
@@ -12,14 +13,14 @@ export default class Registry {
 		if (Registry.has(name)){
 			throw new Error("Registry collision!");
 		}
-		if (typeof cache.unwrap !== 'function') {
+		if (!isCache(cache)) {
 			throw new Error("Registry is for caches!");
 		}
 		CACHES[name] = cache;
 	}
 
 	static del(name) {
-		if (!CACHES[name].isUnwrapped()) {
+		if (CACHES[name].isWrapped()) {
 			throw new Error("Must unwrap to unregister!");
 		}
 		delete CACHES[name];
@@ -29,5 +30,10 @@ export default class Registry {
 	// Unwraps all wrapped functions and clears the registry.
 	static clear() {
 		_.forEach(CACHES, cache => cache.unwrap());
+		const remaining = Object.keys(CACHES);
+		if (remaining.length) {
+			remaining.forEach(k => delete CACHES[k]);
+			throw new Error("A non-cache snuck in!");
+		}
 	}
 }

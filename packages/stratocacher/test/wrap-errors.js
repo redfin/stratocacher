@@ -14,7 +14,7 @@ describe("The wrap function", () => {
 		expect(unnamed).toThrowError("Need a named function!");
 	});
 
-	it("Only accepts a name once", () => {
+	it("only accepts a name once", () => {
 		const named = () => {
 			wrap({}, function A(){});
 		}
