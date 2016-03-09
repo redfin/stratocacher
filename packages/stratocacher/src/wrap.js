@@ -2,22 +2,20 @@ import _ from "lodash";
 import Q from "q";
 import events from "./events";
 import {makeKey} from "./keys";
+import Registry from "./registry";
 
 import {
 	DEFAULT_TTL,
 	DEFAULT_TTR_RATIO,
 } from "./constants";
 
-const CACHES = {};
-
 export default function wrap(opts, func){
 	if (!func.name) throw new Error("Need a named function!");
 
 	// Really don't want collisions.
-	if (CACHES[func.name]) {
+	if (Registry.has(func.name)) {
 		throw new Error("Cache name collision!");
 	}
-	CACHES[func.name] = true;
 
 	opts = _.clone(opts);
 
@@ -139,7 +137,11 @@ export default function wrap(opts, func){
 			.then(() => time('overall', new Date - _t0))
 	}
 
-	return function() {
+	let unwrapped = false;
+	const wrapped = function() {
+		if (unwrapped) {
+			return func.apply(this, arguments);
+		}
 		const _t0 = new Date;
 		const ret = Q.defer();
 		const run = args => lookup.call(this, _t0, args)
@@ -157,4 +159,19 @@ export default function wrap(opts, func){
 
 		return ret.promise;
 	}
+
+	// Un-cache.  Return the original function.  Disable caching in our
+	// original return value.  Free up the function name for future
+	// caching.
+	wrapped.unwrap = function(){
+		unwrapped = true;
+		Registry.del(name);
+		return func;
+	}
+
+	wrapped.isWrapped = () => !unwrapped;
+
+	Registry.add(name, wrapped);
+
+	return wrapped;
 }
