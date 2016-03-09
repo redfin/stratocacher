@@ -141,7 +141,8 @@ export default function wrap(opts, func){
 
 	return function() {
 		const _t0 = new Date;
-		return Q(before(Array.from(arguments)))
-			.then(args => lookup.call(this, _t0, args));
+		return Q(Array.from(arguments))
+			.then(before)
+			.then(args => lookup.call(this, _t0, args))
 	}
 }
