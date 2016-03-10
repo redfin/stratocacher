@@ -1,8 +1,8 @@
 import LayerConfiguration from "./layer-configuration";
 
-export default function(layer, arg) {
+export default function(layer) {
 	if (!(layer instanceof LayerConfiguration)) {
 		layer = new LayerConfiguration(layer);
 	}
-	return layer.instantiate(arg);
+	return layer.instantiate(this);
 }
