@@ -3,6 +3,7 @@ import Q from "q";
 import events from "./events";
 import {makeKey} from "./keys";
 import Registry from "./registry";
+import getLayer from "./get-layer";
 
 import {
 	DEFAULT_TTL,
@@ -40,7 +41,7 @@ export default function wrap(opts, func){
 	// Make sure the cache gets and stays populated along the way.
 	const lookup = function(_t0, args) {
 		const key = makeKey(opts, Array.from(args), extra());
-		const lay = layers.map(layer => new layer({key, ttl, ttr}));
+		const lay = layers.map(layer => getLayer(layer, {key, ttl, ttr}));
 		const fix = lay.slice();
 		const ret = Q.defer();
 		const bld = () => {
