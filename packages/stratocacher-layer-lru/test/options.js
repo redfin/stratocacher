@@ -31,16 +31,31 @@ describe("A LayerLRU instance", () => {
 		});
 	});
 
-	it("calls dispose function when set", done => {
+	it("evicts when configured with a max", done => {
 
-		const dispose = jasmine.createSpy('dispose');
+		LayerLRU.configure({max: 2});
 
-		LayerLRU.configure({dispose, max: 1});
+		const l = ['A','B','C']
+			.reduce((m,key) => (m[key] = new LayerLRU({key}), m), {});
+
+
 
 		Q()
-		.then(() => new LayerLRU({key: "A"}).set(obj))
-		.then(() => new LayerLRU({key: "B"}).set(obj))
-		.then(() => expect(dispose).toHaveBeenCalled())
+
+		.then(() => l.A.set(obj))
+		.then(() => (l.A.reset(), l.A.get()))
+		.then(() => expect(l.A.val).toEqual(obj))
+
+		.then(() => l.B.set(obj))
+		.then(() => (l.A.reset(), l.A.get()))
+		.then(() => expect(l.A.val).toEqual(obj))
+		.then(() => (l.B.reset(), l.B.get()))
+		.then(() => expect(l.B.val).toEqual(obj))
+
+		.then(() => l.C.set(obj))
+		.then(() => (l.A.reset(), l.A.get()))
+		.then(() => expect(l.A.val).toBeUndefined())
+
 		.then(done)
 	});
 });

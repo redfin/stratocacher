@@ -2,13 +2,12 @@ import {Layer} from "stratocacher";
 import LRU from "lru-cache";
 
 import Q from "q";
-import _ from "lodash";
 
 const CACHES = {};
 function cache(layer) {
-	const {cid, opt} = layer;
+	const {cid} = layer;
 	if (!CACHES[cid]) {
-		CACHES[cid] = LRU(_.pick(opt, ['max', 'dispose']));
+		CACHES[cid] = LRU({max: layer.opt.max});
 	}
 	return CACHES[cid];
 }
@@ -22,7 +21,7 @@ export default class LayerLRU extends Layer {
 
 	get() {
 		let val = cache(this).get(this.key);
-		if (copy(this)) {
+		if (val && shouldCopy(this)) {
 			val = JSON.parse(val);
 		}
 		this.load(val);
@@ -31,7 +30,7 @@ export default class LayerLRU extends Layer {
 
 	set(val) {
 		val = this.dump(val);
-		if (copy(this)) {
+		if (shouldCopy(this)) {
 			val = JSON.stringify(val);
 		}
 		cache(this).set(this.key, val);
@@ -39,7 +38,7 @@ export default class LayerLRU extends Layer {
 	}
 }
 
-function copy(layer){
+function shouldCopy(layer){
 	const {opt} = layer;
 	return opt.copy || !opt.hasOwnProperty('copy');
 }
