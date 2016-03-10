@@ -1,13 +1,21 @@
+import LayerConfiguration from "./layer-configuration";
+
 export default class Layer {
 	constructor({
 		key,
 		ttl,
 		ttr,
+		opt,
 	}) {
 		this.key = key;
 		this.now = new Date;
 		this.ttl = ttl;
 		this.ttr = ttr;
+		this.opt = opt;
+	}
+
+	static configure(opt) {
+		return new LayerConfiguration(this, opt);
 	}
 
 	name() {
