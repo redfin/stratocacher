@@ -1,20 +1,27 @@
 import {Layer} from "stratocacher";
+import LRU from "lru-cache";
 
 import Q from "q";
+import _ from "lodash";
 
-// Be careful with this!
-//  * It caches by _reference_ (by default)!
-//  * In _never_ evicts!
-const CACHE = {};
-export default class LayerSimpleObject extends Layer {
+const CACHES = {};
+function cache(layer) {
+	const {cid, opt} = layer;
+	if (!CACHES[cid]) {
+		CACHES[cid] = LRU(_.pick(opt, ['max', 'dispose']));
+	}
+	return CACHES[cid];
+}
+
+export default class LayerLRU extends Layer {
 
 	static reset() {
 		super.reset();
-		Object.keys(CACHE).forEach(k => delete CACHE[k]);
+		Object.keys(CACHES).forEach(k => delete CACHES[k]);
 	}
 
 	get() {
-		let val = CACHE[this.key];
+		let val = cache(this).get(this.key);
 		if (this.opt.copy) {
 			val = JSON.parse(val);
 		}
@@ -27,7 +34,7 @@ export default class LayerSimpleObject extends Layer {
 		if (this.opt.copy) {
 			val = JSON.stringify(val);
 		}
-		CACHE[this.key] = val;
+		cache(this).set(this.key, val);
 		return Q(); // We're synchronous but need to return a promise.
 	}
 }

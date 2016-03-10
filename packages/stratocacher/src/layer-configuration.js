@@ -11,25 +11,23 @@ export default class LayerConfiguration {
 		}
 	}
 
-	static global(cls) {
-		return GLOBAL[cls.name] || {};
+	static global(cls, opt) {
+		if (opt) {
+			// Global is always newest.
+			GLOBAL[cls.name] = Object.freeze(opt);
+		} else if (!GLOBAL[cls.name]) {
+			GLOBAL[cls.name] = Object.freeze({});
+		}
+		return GLOBAL[cls.name];
 	}
 
 	constructor(cls, opt) {
 		this.cls = cls;
-		this.setOptions(opt);
-	}
-
-	setOptions(opt) {
-		if (opt) {
-			// Global is always newest.
-			GLOBAL[this.cls.name] = opt;
-		}
-		this.opt = opt || GLOBAL[this.cls.name];
+		this.opt = LayerConfiguration.global(cls, opt);
 	}
 
 	instantiate(arg) {
-		const opt = _.clone(this.opt);
+		const opt = this.opt;
 		return new this.cls(_.assign({opt}, arg));
 	}
 }
