@@ -8,10 +8,10 @@ export default class Layer {
 		opt,
 	}) {
 		this.key = key;
-		this.now = new Date;
-		this.ttl = ttl;
-		this.ttr = ttr;
+		this.ttl = ttl || false;
+		this.ttr = ttr || false;
 		this.opt = opt || LayerConfiguration.global(this.constructor);
+		this.reset();
 	}
 
 	static configure(opt) {
@@ -20,6 +20,14 @@ export default class Layer {
 
 	name() {
 		return this.constructor.name;
+	}
+
+	reset() {
+		delete this.val;
+		delete this.exp;
+		delete this.red;
+		delete this.age;
+		this.now = +new Date;
 	}
 
 	dump(val) {
@@ -31,9 +39,9 @@ export default class Layer {
 
 	load(val) {
 		if (typeof val === 'undefined') return;
-		this.val = val.v;
 		this.age = this.now - val.t;
 		this.exp = this.ttl && this.age > this.ttl;
 		this.red = this.ttr && this.age > this.ttr;
+		this.val = this.exp?undefined:val.v;
 	}
 }
