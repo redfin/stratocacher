@@ -3,8 +3,16 @@ import _ from "lodash";
 const GLOBAL = {};
 export default class LayerConfiguration {
 
-	static reset() {
-		_.forEach(GLOBAL, (v, k) => delete GLOBAL[k])
+	static reset(cls) {
+		if (cls) {
+			delete GLOBAL[cls.name];
+		} else {
+			_.forEach(GLOBAL, (v, k) => delete GLOBAL[k])
+		}
+	}
+
+	static global(cls) {
+		return GLOBAL[cls.name] || {};
 	}
 
 	constructor(cls, opt) {

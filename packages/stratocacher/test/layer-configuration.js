@@ -30,8 +30,8 @@ describe("Layer configuration", () => {
 			.toEqual({val});
 	});
 
-	it("defaults to undefined opts", () => {
+	it("defaults to empty object", () => {
 		expect(new LayerConfiguration(LayerTestObject).instantiate().opt)
-			.toBeUndefined();
+			.toEqual({});
 	});
 });

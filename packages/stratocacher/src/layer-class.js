@@ -11,7 +11,7 @@ export default class Layer {
 		this.now = new Date;
 		this.ttl = ttl;
 		this.ttr = ttr;
-		this.opt = opt;
+		this.opt = opt || LayerConfiguration.global(this.constructor);
 	}
 
 	static configure(opt) {
