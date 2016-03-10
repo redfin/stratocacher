@@ -1,6 +1,6 @@
 {
   "name": "stratocacher-layer-simple-object",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple by-reference cache layer with no eviction",
   "main": "index.js",
   "scripts": {
