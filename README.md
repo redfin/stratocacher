@@ -6,6 +6,7 @@
 
 - [Stratocacher](packages/stratocacher/README.md)
 - Available layers:
+    - [LayerLRU](packages/stratocacher-layer-lru/README.md)
     - [LayerSimpleObject](packages/stratocacher-layer-simple-object/README.md)
 - [Contributing](CONTRIBUTING.md)
 
