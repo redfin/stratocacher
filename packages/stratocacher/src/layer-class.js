@@ -10,8 +10,9 @@ export default class Layer {
 		this.key = key;
 		this.ttl = ttl || false;
 		this.ttr = ttr || false;
-		this.opt = opt || LayerConfiguration.global(this.constructor);
-		this.cid = getConfigId(this);
+		this.cls = this.constructor;
+		this.opt = LayerConfiguration.getConfig  (this.cls, opt);
+		this.cid = LayerConfiguration.getConfigId(this.cls, opt);
 		this.reset();
 	}
 
@@ -20,11 +21,11 @@ export default class Layer {
 	}
 
 	static reset() {
-		while (CONFIG.length) CONFIG.pop();
+		LayerConfiguration.reset(this);
 	}
 
 	name() {
-		return this.constructor.name;
+		return this.cls.name;
 	}
 
 	reset() {
@@ -49,15 +50,4 @@ export default class Layer {
 		this.red = this.ttr && this.age > this.ttr;
 		this.val = this.exp?undefined:val.v;
 	}
-}
-
-const CONFIG = [];
-function getConfigId(layer) {
-	const {opt} = layer;
-	let cid = CONFIG.reduce((m,v,k) => (v === opt)?k:m, null);
-	if (cid === null) {
-		cid = CONFIG.length;
-		CONFIG[cid] = opt;
-	}
-	return cid;
 }

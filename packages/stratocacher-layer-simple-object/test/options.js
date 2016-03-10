@@ -1,11 +1,9 @@
 const LayerSimpleObject = require("../lib/index.js").default;
-const {LayerConfiguration} = require("stratocacher");
 
 describe("A LayerSimpleObject instance", () => {
 
 	afterEach(() => {
 		LayerSimpleObject.reset();
-		LayerConfiguration.reset();
 	});
 
 	it("stashes references by default", done => {

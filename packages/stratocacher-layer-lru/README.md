@@ -13,7 +13,10 @@ The following [lru-cache options](https://github.com/isaacs/node-lru-cache#optio
 
 - `dispose` Function that is called on items when they are dropped from the
   cache. This can be handy if you want to close file descriptors or do other
-  cleanup tasks when items are no longer accessible. Called with `key, value`.
+  cleanup tasks when items are no longer accessible. Mostly only makes sense
+  when `copy` is false. Called _only_ with `value`.  This is different from
+  `lru-cache`, which calls with `key, value`.  Stratocacher keys are not
+  exposed.
 
 The following options affect the behavior of `LayerLRU` itself, and arenn't
 passed through to `lru-cache`:

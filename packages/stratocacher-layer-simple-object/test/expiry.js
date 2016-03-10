@@ -1,6 +1,5 @@
 const LayerSimpleObject = require("../lib/index.js").default;
-const {LayerConfiguration, constants} = require("stratocacher");
-const {ONE_HOUR} = constants;
+const {ONE_HOUR} = require("stratocacher").constants;
 
 describe("A LayerSimpleObject entry", () => {
 
@@ -23,7 +22,6 @@ describe("A LayerSimpleObject entry", () => {
 
 	afterEach(() => {
 		LayerSimpleObject.reset();
-		LayerConfiguration.reset();
 		jasmine.clock().uninstall();
 		layerRef.reset();
 		layerCopy.reset();

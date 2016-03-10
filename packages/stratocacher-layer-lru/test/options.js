@@ -1,5 +1,4 @@
 const LayerLRU = require("../lib/index.js").default;
-const {LayerConfiguration} = require("stratocacher");
 const Q = require("q");
 
 describe("A LayerLRU instance", () => {
@@ -7,28 +6,27 @@ describe("A LayerLRU instance", () => {
 
 	afterEach(() => {
 		LayerLRU.reset();
-		LayerConfiguration.reset();
 	});
 
-	it("stashes references by default", done => {
-
-		const layer = new LayerLRU({key: "A"});
-
-		layer.set(obj).then(() => layer.get()).then(() => {
-			expect(layer.val).toBe(obj);
-			done();
-		});
-	});
-
-	it("stashes copies when configured to copy", done => {
-
-		LayerLRU.configure({copy: true});
+	it("stashes copies by default", done => {
 
 		const layer = new LayerLRU({key: "A"});
 
 		layer.set(obj).then(() => layer.get()).then(() => {
 			expect(layer.val).not.toBe(obj);
 			expect(layer.val).toEqual(obj);
+			done();
+		});
+	});
+
+	it("stashes references when configured not to copy", done => {
+
+		LayerLRU.configure({copy: false});
+
+		const layer = new LayerLRU({key: "A"});
+
+		layer.set(obj).then(() => layer.get()).then(() => {
+			expect(layer.val).toBe(obj);
 			done();
 		});
 	});

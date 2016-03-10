@@ -22,7 +22,7 @@ export default class LayerLRU extends Layer {
 
 	get() {
 		let val = cache(this).get(this.key);
-		if (this.opt.copy) {
+		if (copy(this)) {
 			val = JSON.parse(val);
 		}
 		this.load(val);
@@ -31,10 +31,15 @@ export default class LayerLRU extends Layer {
 
 	set(val) {
 		val = this.dump(val);
-		if (this.opt.copy) {
+		if (copy(this)) {
 			val = JSON.stringify(val);
 		}
 		cache(this).set(this.key, val);
 		return Q(); // We're synchronous but need to return a promise.
 	}
+}
+
+function copy(layer){
+	const {opt} = layer;
+	return opt.copy || !opt.hasOwnProperty('copy');
 }
