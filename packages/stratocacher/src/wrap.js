@@ -151,10 +151,10 @@ export default function wrap(opts, func){
 
 		Q(Array.from(arguments))
 			.then(before)
-			.then(run, err => {
+			.then(run, error => {
 				// If the `before` hook fails, we'll proceed
 				// with caching disabled.
-				events.emit('error', err);
+				events.emit('error', {name, error});
 				run([null]);
 			})
 
