@@ -40,7 +40,7 @@ export default function wrap(opts, func){
 	// Find a value in the cache or build it if it's not there.
 	// Make sure the cache gets and stays populated along the way.
 	const lookup = function(_t0, args) {
-		const key = makeKey(opts, Array.from(args), extra());
+		const key = args && makeKey(opts, Array.from(args), extra());
 		const lay = layers.map(getLayer.bind({key, ttl, ttr}));
 		const fix = lay.slice();
 		const ret = Q.defer();
@@ -54,19 +54,17 @@ export default function wrap(opts, func){
 				});
 		}
 
-		// If we couldn't make a key, then we can't cache.
-		if (!key) return Q(bld());
-
 		const pump = () => {
 
 			// Get the next layer.
 			const cur = lay.shift();
 			const _t1 = new Date;
 
+			// If we couldn't make a key, then we force a miss.
 			// If we're out of layers, then we'll just have to
 			// build.  It's a full miss.
 			// We can _force_ a miss with the `_bust` parameter.
-			if (!cur || force()) {
+			if (!key || !cur || force()) {
 				bld().then(val => {
 
 					// Hand it off.
@@ -153,10 +151,7 @@ export default function wrap(opts, func){
 			// If the `before` hook fails, we'll proceed
 			// with caching disabled.
 			events.emit('error', {name, error});
-			return Q()
-				.then(() => func.apply(this, arguments))
-				.then(v => ret.resolve(v))
-				.catch(e => ret.reject(e))
+			run(null);
 		}
 
 		Q(Array.from(arguments))

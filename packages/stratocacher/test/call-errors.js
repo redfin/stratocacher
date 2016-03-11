@@ -37,10 +37,10 @@ describe("A wrapper", () => {
 
 		Q()
 		.then(A)
-		.then(() => expect(spies.miss ).not.toHaveBeenCalled())
-		.then(() => expect(spies.build).not.toHaveBeenCalled())
-		.then(() => expect(spies.A    )    .toHaveBeenCalled())
-		.then(() => expect(spies.error)    .toHaveBeenCalled())
+		.then(() => expect(spies.miss ).toHaveBeenCalled())
+		.then(() => expect(spies.build).toHaveBeenCalled())
+		.then(() => expect(spies.A    ).toHaveBeenCalled())
+		.then(() => expect(spies.error).toHaveBeenCalled())
 		.then(expectError('fail'))
 		.then(done);
 	});
@@ -52,10 +52,10 @@ describe("A wrapper", () => {
 
 		Q()
 		.then(A)
-		.then(() => expect(spies.miss ).not.toHaveBeenCalled())
-		.then(() => expect(spies.build).not.toHaveBeenCalled())
-		.then(() => expect(spies.A    )    .toHaveBeenCalled())
-		.then(() => expect(spies.error)    .toHaveBeenCalled())
+		.then(() => expect(spies.miss ).toHaveBeenCalled())
+		.then(() => expect(spies.build).toHaveBeenCalled())
+		.then(() => expect(spies.A    ).toHaveBeenCalled())
+		.then(() => expect(spies.error).toHaveBeenCalled())
 		.then(expectError('before returned falsy'))
 		.then(done);
 	});
@@ -65,10 +65,10 @@ describe("A wrapper", () => {
 
 		Q()
 		.then(() => A({}))
-		.then(() => expect(spies.miss ).not.toHaveBeenCalled())
-		.then(() => expect(spies.build)    .toHaveBeenCalled())
-		.then(() => expect(spies.A    )    .toHaveBeenCalled())
-		.then(() => expect(spies.error)    .toHaveBeenCalled())
+		.then(() => expect(spies.miss ).toHaveBeenCalled())
+		.then(() => expect(spies.build).toHaveBeenCalled())
+		.then(() => expect(spies.A    ).toHaveBeenCalled())
+		.then(() => expect(spies.error).toHaveBeenCalled())
 		.then(expectError('Bad key component ([object Object])'))
 		.then(done);
 	});
