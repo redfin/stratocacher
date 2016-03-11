@@ -39,8 +39,8 @@ export default function wrap(opts, func){
 
 	// Find a value in the cache or build it if it's not there.
 	// Make sure the cache gets and stays populated along the way.
-	const lookup = function(_t0, args) {
-		const key = args && makeKey(opts, Array.from(args), extra());
+	const lookup = function(_t0, args, keys) {
+		const key = keys && makeKey(opts, Array.from(keys), extra());
 		const lay = layers.map(getLayer.bind({key, ttl, ttr}));
 		const fix = lay.slice();
 		const ret = Q.defer();
@@ -141,9 +141,11 @@ export default function wrap(opts, func){
 		if (unwrapped) {
 			return func.apply(this, arguments);
 		}
+		const arg = Array.from(arguments);
+		const key = arg.slice();
 		const _t0 = new Date;
 		const ret = Q.defer();
-		const run = args => lookup.call(this, _t0, args)
+		const run = keys => lookup.call(this, _t0, arg, keys)
 			.then(v => ret.resolve(v))
 			.catch(e => ret.reject(e))
 
@@ -154,10 +156,10 @@ export default function wrap(opts, func){
 			run(null);
 		}
 
-		Q(Array.from(arguments))
+		Q(key)
 			.then(before)
-			.then(args => args
-				?run(args)
+			.then(keys => keys
+				?run(keys)
 				:nop(new Error("before returned falsy"))
 			, nop);
 
