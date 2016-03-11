@@ -149,14 +149,22 @@ export default function wrap(opts, func){
 			.then(v => ret.resolve(v))
 			.catch(e => ret.reject(e))
 
+		const nop = error => {
+			// If the `before` hook fails, we'll proceed
+			// with caching disabled.
+			events.emit('error', {name, error});
+			return Q()
+				.then(() => func.apply(this, arguments))
+				.then(v => ret.resolve(v))
+				.catch(e => ret.reject(e))
+		}
+
 		Q(Array.from(arguments))
 			.then(before)
-			.then(run, error => {
-				// If the `before` hook fails, we'll proceed
-				// with caching disabled.
-				events.emit('error', {name, error});
-				run([null]);
-			})
+			.then(args => args
+				?run(args)
+				:nop(new Error("before returned falsy"))
+			, nop);
 
 		return ret.promise;
 	}

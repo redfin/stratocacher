@@ -18,7 +18,7 @@ export function makeKey({
 			typeof pieces[i] !== 'number'
 		){
 			const error = new Error(
-				`Bad key component (${pieces[i]}) in ${name}`
+				`Bad key component (${pieces[i]})`
 			);
 			events.emit('error', {name, error});
 			return null;
