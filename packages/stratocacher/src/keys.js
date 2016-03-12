@@ -4,13 +4,12 @@ import events from "./events";
 export function makeKey({
 	name,
 	version,
-}, args, extra){
+}, args){
 	const pieces = [
 		GLOBAL_VERSION,
 		name,
 		version || 0,
 		...args,
-		...extra,
 	]
 	for (let i = 0; i < pieces.length; i++){
 		if (

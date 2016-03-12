@@ -31,7 +31,6 @@ export default function wrap(opts, func){
 		layers  = [],
 		before  = _ => Q(_),   // Munge arguments.
 		after   = _ => Q(_),   // Munge response.
-		extra   = () => [],    // Extra key components.
 		force   = () => false, // Force a miss.
 	} = opts;
 
@@ -40,7 +39,7 @@ export default function wrap(opts, func){
 	// Find a value in the cache or build it if it's not there.
 	// Make sure the cache gets and stays populated along the way.
 	const lookup = function(_t0, args, keys) {
-		const key = keys && makeKey(opts, Array.from(keys), extra());
+		const key = keys && makeKey(opts, keys);
 		const lay = layers.map(getLayer.bind({key, ttl, ttr}));
 		const fix = lay.slice();
 		const ret = Q.defer();
