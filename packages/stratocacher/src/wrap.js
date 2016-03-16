@@ -3,7 +3,7 @@ import Q from "q";
 import events from "./events";
 import {makeKey} from "./keys";
 import Registry from "./registry";
-import getLayer from "./get-layer";
+import LayerConfiguration from "./layer-configuration";
 
 import {
 	DEFAULT_TTL,
@@ -36,11 +36,18 @@ export default function wrap(opts, func){
 
 	const time = (type, time) => events.emit('time', {type, name, time});
 
+	// Bind configuration at wrap time.
+	layers.forEach((l, i) => {
+		if (!(l instanceof LayerConfiguration)) {
+			layers[i] = l.configure();
+		}
+	});
+
 	// Find a value in the cache or build it if it's not there.
 	// Make sure the cache gets and stays populated along the way.
 	const lookup = function(_t0, args, keys) {
 		const key = keys && makeKey(opts, keys);
-		const lay = layers.map(getLayer.bind({key, ttl, ttr}));
+		const lay = layers.map(l => l.instantiate({key, ttl, ttr}));
 		const fix = lay.slice();
 		const ret = Q.defer();
 		const bld = () => {
