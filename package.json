@@ -13,6 +13,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-eslint": "^2.0.0",
     "gulp-jasmine": "^2.3.0",
+    "gulp-matcha": "^1.1.0",
     "gulp-nsp": "^2.3.0",
     "lerna": "git://github.com/kittens/lerna.git#4b2cbadeb9a95273b5f2dad631ca4a18e77c752e",
     "meow": "^3.7.0"
