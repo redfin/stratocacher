@@ -11,6 +11,19 @@ import {
 } from "./constants";
 
 export default function wrap(opts, func){
+
+	// Accept arguments in either order.  They're necessarily different
+	// types, so whatever's nicer for callers.
+	if (typeof opts === 'function') {
+		[opts, func] = [func, opts];
+	}
+
+	// This also means we can accept _no opts_ as all defaults.
+	// Not really useful, but a fine degenerate case.
+	if (typeof opts === 'undefined') {
+		opts = {};
+	}
+
 	if (!func.name) throw new Error("Need a named function!");
 
 	// Really don't want collisions.

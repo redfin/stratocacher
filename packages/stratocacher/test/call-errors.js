@@ -61,7 +61,7 @@ describe("A wrapper", () => {
 	});
 
 	it("is builds if arg isn't keyable", done => {
-		const A = wrap({}, function A() { spies.A() })
+		const A = wrap(function A() { spies.A() })
 
 		Q()
 		.then(() => A({}))
