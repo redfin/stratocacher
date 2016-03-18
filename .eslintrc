@@ -9,10 +9,6 @@
     "jasmine": true,
     "node": true
   },
-  "globals": {
-    "suite": false,
-    "bench": false
-  },
   "rules": {
     "camelcase": 0,
     "comma-dangle": [

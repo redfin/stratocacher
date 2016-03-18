@@ -84,7 +84,7 @@ export default function wrap(opts, func){
 				return;
 			}
 
-			cur.get().then(() => {
+			Q().then(() => cur.get()).then(() => {
 
 				// If we found a value and it's not expired.
 				if (cur.val && !cur.exp) {
