@@ -1,8 +1,10 @@
 const wrap = require('../lib/wrap').default;
-const LayerNoStore = require('../lib/dev/layer-no-store').default;
+const LayerInstantAge = require('../lib/dev/layer-instant-age').default;
 const _ = require('lodash');
 
-suite('misses', () => {
+LayerInstantAge.configure({by: 2})
+
+suite('expired values', () => {
 	set('mintime', 1000);
 	[
 		'no', 'one', 'two', 'four', 'eight', 'sixteen',
@@ -10,9 +12,10 @@ suite('misses', () => {
 	].forEach((name, i) => {
 		const n = i && 1<<(i-1);
 		const func = function(){}
-		Object.defineProperty(func, "name", {value: 'misses'+name});
+		Object.defineProperty(func, "name", {value: 'expired'+name});
 		const wrapped = wrap({
-			layers: _.range(n).map(() => LayerNoStore),
+			ttl: 1,
+			layers: _.range(n).map(() => LayerInstantAge),
 		}, func);
 		bench(`${name} layer${n===1?'':'s'}`, n => wrapped().then(n));
 	});
