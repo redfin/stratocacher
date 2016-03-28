@@ -6,10 +6,12 @@ export default class Layer {
 		ttl,
 		ttr,
 		opt,
+		inv,
 	}) {
 		this.key = key;
 		this.ttl = ttl || false;
 		this.ttr = ttr || false;
+		this.inv = inv || false;
 		this.cls = this.constructor;
 		this.opt = LayerConfiguration.getConfig  (this.cls, opt);
 		this.cid = LayerConfiguration.getConfigId(this.cls, opt);
@@ -40,6 +42,7 @@ export default class Layer {
 		return {
 			'v': val,
 			't': this.now,
+			'i': this.inv,
 		}
 	}
 
@@ -49,5 +52,6 @@ export default class Layer {
 		this.exp = this.ttl && this.age > this.ttl;
 		this.red = this.ttr && this.age > this.ttr;
 		this.val = this.exp?undefined:val.v;
+		this.inv = val.i;
 	}
 }

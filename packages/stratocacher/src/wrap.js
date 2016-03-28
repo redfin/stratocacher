@@ -8,6 +8,7 @@ import LayerConfiguration from "./layer-configuration";
 import {
 	DEFAULT_TTL,
 	DEFAULT_TTR_RATIO,
+	INVALIDATE,
 } from "./constants";
 
 export default function wrap(opts, func){
@@ -57,15 +58,15 @@ export default function wrap(opts, func){
 
 	// Find a value in the cache or build it if it's not there.
 	// Make sure the cache gets and stays populated along the way.
-	const lookup = function(_t0, args, keys) {
+	const lookup = function({_t0, arg, keys, inv}) {
 		const key = keys && makeKey(opts, keys);
-		const lay = layers.map(l => l.instantiate({key, ttl, ttr}));
+		const lay = layers.map(l => l.instantiate({key, ttl, ttr, inv}));
 		const fix = lay.slice();
 		const ret = Q.defer();
 		const bld = () => {
 			const _t1 = new Date;
 			return Q()
-				.then(() => func.apply(this, args))
+				.then(() => func.apply(this, arg))
 				.then(val => {
 					time('build', new Date - _t1);
 					return val;
@@ -138,8 +139,13 @@ export default function wrap(opts, func){
 			});
 		}
 
-		// Start looking!
-		pump();
+		if (inv) {
+			// Invalidate.
+			Q.all(fix.map(l => l.set())).then(ret.resolve);
+		} else {
+			// Start looking!
+			pump();
+		}
 
 		// Log if we reject.
 		ret.promise.catch(() => time('error.returned', new Date - _t0));
@@ -157,13 +163,14 @@ export default function wrap(opts, func){
 	let unwrapped = false;
 	const wrapped = function() {
 		if (unwrapped) {
-			return func.apply(this, arguments);
+			return func.apply(this, clean(arguments));
 		}
-		const arg = Array.from(arguments);
+		const arg = clean(arguments);
+		const inv = invIn(arguments);
 		const key = arg.slice();
 		const _t0 = new Date;
 		const ret = Q.defer();
-		const run = keys => lookup.call(this, _t0, arg, keys)
+		const run = keys => lookup.call(this, {_t0, arg, keys, inv})
 			.then(v => ret.resolve(v))
 			.catch(e => ret.reject(e))
 
@@ -193,9 +200,24 @@ export default function wrap(opts, func){
 		return func;
 	}
 
+	wrapped.invalidate = function(){
+		return wrapped.apply(this, [INVALIDATE, ...clean(arguments)]);
+	}
+
 	wrapped.isWrapped = () => !unwrapped;
 
 	Registry.add(name, wrapped);
 
 	return wrapped;
+}
+
+// Return an array containing elements from supplied `arguments` object that
+// are not control symbols.
+function clean(args) {
+	return Array.prototype.filter.call(args, v => v !== INVALIDATE);
+}
+
+// Return true if `INVALIDATE` is in the supplied `arguments` object.
+function invIn(args) {
+	return Array.prototype.indexOf.call(args, INVALIDATE) !== -1;
 }
