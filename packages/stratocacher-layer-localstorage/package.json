@@ -1,7 +1,7 @@
 {
   "name": "stratocacher-layer-localstorage",
   "version": "0.0.4",
-  "description": "An stratocacher layer using browser's localStorage through store.js",
+  "description": "A stratocacher layer using browser's localStorage through store.js",
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp prepublish",
