@@ -5,13 +5,6 @@ import Q from "q";
 
 export default class LocalStorage extends Layer {
 
-	static reset() {
-		super.reset();
-		localStorage.forEach((key) => {
-			localStorage.remove(key);
-		});
-	}
-
 	get() {
 		let val = localStorage.get(this.key);
 		this.load(val);
