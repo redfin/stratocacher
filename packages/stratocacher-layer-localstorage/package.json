@@ -1,0 +1,33 @@
+{
+  "name": "stratocacher-layer-localstorage",
+  "version": "0.0.4",
+  "description": "A stratocacher layer using browser's localStorage through store.js",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redfin/stratocacher.git"
+  },
+  "keywords": [
+    "stratocacher",
+    "cache",
+    "layer",
+    "localstorage"
+  ],
+  "author": "Jennifer Hwang",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/redfin/stratocacher/issues"
+  },
+  "homepage": "https://github.com/redfin/stratocacher/packages/stratocacher-layer-localstorage#readme",
+  "dependencies": {
+    "q": "^1.4.1",
+    "store": "^1.3.20"
+  },
+  "peerDependencies": {
+    "stratocacher": "^0.0.4"
+  }
+}
