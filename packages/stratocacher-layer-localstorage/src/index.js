@@ -3,7 +3,7 @@ import localStorage from "store";
 
 import Q from "q";
 
-export default class LocalStorage extends Layer {
+export default class LayerLocalStorage extends Layer {
 
 	get() {
 		let val = localStorage.get(this.key);
