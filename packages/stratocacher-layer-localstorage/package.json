@@ -28,6 +28,6 @@
     "store": "^1.3.20"
   },
   "peerDependencies": {
-    "stratocacher": "^0.0.8"
+    "stratocacher": "^0.0.10"
   }
 }

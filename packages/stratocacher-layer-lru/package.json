@@ -28,6 +28,6 @@
     "q": "^1.4.1"
   },
   "peerDependencies": {
-    "stratocacher": "^0.0.8"
+    "stratocacher": "^0.0.10"
   }
 }
