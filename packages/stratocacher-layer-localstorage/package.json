@@ -1,6 +1,6 @@
 {
   "name": "stratocacher-layer-localstorage",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A stratocacher layer using browser's localStorage through store.js",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,6 @@
     "store": "^1.3.20"
   },
   "peerDependencies": {
-    "stratocacher": "^0.0.10"
+    "stratocacher": "^0.0.12"
   }
 }

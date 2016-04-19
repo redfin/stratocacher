@@ -1,6 +1,6 @@
 {
   "name": "stratocacher-layer-lru",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "An in-process lru stratocacher layer",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,6 @@
     "q": "^1.4.1"
   },
   "peerDependencies": {
-    "stratocacher": "^0.0.10"
+    "stratocacher": "^0.0.12"
   }
 }

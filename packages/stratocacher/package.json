@@ -1,6 +1,6 @@
 {
   "name": "stratocacher",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "description": "A cache with pluggable layers",
   "main": "index.js",
   "scripts": {
