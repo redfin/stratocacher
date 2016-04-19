@@ -11,7 +11,7 @@ describe("The wrap function", () => {
 		const unnamed = () => {
 			wrap(function(){});
 		}
-		expect(unnamed).toThrowError("Need a named function!");
+		expect(unnamed).toThrowError("Need a name or a named function!");
 	});
 
 	it("only accepts a name once", () => {
@@ -20,5 +20,12 @@ describe("The wrap function", () => {
 		}
 		expect(named).not.toThrow();
 		expect(named).toThrowError("Cache name collision!");
+	});
+
+	it("can receive its name from opts", () => {
+		const nameInOpts = () => {
+			wrap(function(){}, {name: 'A'});
+		}
+		expect(nameInOpts ).not.toThrow();
 	});
 });

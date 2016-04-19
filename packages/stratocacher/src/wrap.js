@@ -22,20 +22,19 @@ export default function wrap(opts, func){
 	// Not really useful, but a fine degenerate case.
 	if (typeof opts === 'undefined') {
 		opts = {};
+	} else {
+		opts = _.clone(opts);
 	}
 
-	if (!func.name) throw new Error("Need a named function!");
+	if (!opts.name) opts.name = func.name;
+
+	if (!opts.name) throw new Error("Need a name or a named function!");
 
 	// Really don't want collisions.
 	if (Registry.has(func.name)) {
 		throw new Error("Cache name collision!");
 	}
 
-	opts = _.clone(opts);
-
-	// Module and function.
-	// (and a color for logging).
-	opts.name  = func.name;
 
 	const {
 		name,
