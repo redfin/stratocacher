@@ -1,4 +1,9 @@
-# Stratocacher monorepo [![Build Status][build-badge-img]][build-url] [![NPM version][npm-badge-img]][npm-url] [![NPM version][npm-license-img]][npm-url] [![Powered by Redfin][redfin-img]][redfin-url]
+# Stratocacher monorepo
+
+[![Build Status][build-badge-img]][build-url]
+[![NPM version][npm-badge-img]][npm-url]
+[![NPM version][npm-license-img]][npm-url]
+[![Powered by Redfin][redfin-img]][redfin-url]
 
 ### A cache with pluggable layers.
 
