@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/redfin/stratocacher#readme",
   "dependencies": {
-    "lodash": "^4.6.1",
-    "q": "^1.4.1"
+    "lodash": "^4.17.10",
+    "q": "^1.5.1"
   }
 }
