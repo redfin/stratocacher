@@ -25,9 +25,7 @@
   "homepage": "https://github.com/redfin/stratocacher/packages/stratocacher-layer-lru#readme",
   "dependencies": {
     "lru-cache": "^4.0.0",
-    "q": "^1.4.1"
-  },
-  "peerDependencies": {
+    "q": "^1.4.1",
     "stratocacher": "^0.0.12"
   }
 }

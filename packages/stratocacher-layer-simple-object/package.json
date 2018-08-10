@@ -23,9 +23,7 @@
   },
   "homepage": "https://github.com/redfin/stratocacher#readme",
   "dependencies": {
-    "q": "^1.4.1"
-  },
-  "peerDependencies": {
+    "q": "^1.4.1",
     "stratocacher": "^0.0.12"
   }
 }
