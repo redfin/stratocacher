@@ -1,0 +1,34 @@
+{
+    "name": "stratocacher-layer-dynamo",
+    "version": "0.0.1",
+    "description": "A dynamo db stratocacher layer",
+    "main": "index.js",
+    "scripts": {
+        "prepublish": "gulp prepublish",
+        "test": "gulp test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/redfin/stratocacher.git"
+    },
+    "keywords": [
+        "stratocacher",
+        "cache",
+        "layer",
+        "lru"
+    ],
+    "author": "Matt Olson",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/redfin/stratocacher/issues"
+    },
+    "homepage": "https://github.com/redfin/stratocacher/packages/stratocacher-layer-dynamo#readme",
+    "dependencies": {
+        "aws-sdk": "^2.289.0",
+        "q": "^1.5.1",
+        "stratocacher": "^0.0.12"
+    },
+    "devDependencies": {
+        "mock-require": "^3.0.2"
+    }
+}
