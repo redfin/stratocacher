@@ -4,35 +4,36 @@ const cache = {};
 //Dynamo client mock
 function DynamoDB() {
 	this.getItem = (params, cb) => {
-		const key = params.Key.CacheKey.S;
+		const key = params.Key.key.S;
 		const tableName = params.TableName;
-		cb(cache[tableName][key]);
+		cb({Item: cache[tableName][key]});
 	}
 
 	this.putItem = (params, cb) => {
-		const key = params.Item.CacheKey.S;
-		const val = params.Item.Value.S;
+		const key = params.Item.key.S;
 		const tableName = params.tableName;
 
 		if (!cache[tableName]) cache[tableName] = {};
 
-		cb(cache[tableName][key] = val);
+		cb(cache[tableName][key] = params.Item);
 	}
 }
 
 mockRequire("aws-sdk", {DynamoDB});
 
 describe("A LayerDynamo instance", () => {
-	const obj = { foo: "bar" }
+	const obj = "xxxx";
 	var LayerDynamo;
 
 	beforeAll(() => {
 		LayerDynamo = require("../lib/index.js").default;
 		LayerDynamo.configure({
-			cacheTableName: "my-table",
-			cacheKeyFieldName: "CacheKey",
-			cacheValueFieldName: "Value",
-			awsConfig: {},
+			tableName: "cache",
+			awsConfig: {
+				accessKeyId: "xxxx",
+				secretAccessKey: "xxxx",
+				region: "us-west-2",
+			},
 		});
 	});
 
