@@ -28,11 +28,10 @@ export default class LayerDynamo extends Layer {
 
 	constructor(options) {
 		super(options);
-
 		if (!this.opt.tableName) {
 			throw new Error("Must provide tableName");
 		}
-		if (!this.opt.tableName) {
+		if (!this.opt.awsConfig) {
 			throw new Error("Must provide awsConfig");
 		}
 	}
