@@ -2,7 +2,7 @@ import Q from "q";
 import {DynamoDB} from "aws-sdk";
 import {Layer} from "stratocacher";
 
-var client, awsConfig, tableName;
+var CLIENT;
 
 class Client {
 	constructor(awsConfig) {
@@ -10,13 +10,6 @@ class Client {
 		this.getItem = Q.nbind(ddbClient.getItem, ddbClient);
 		this.putItem = Q.nbind(ddbClient.putItem, ddbClient);
 	}
-}
-
-function getClient() {
-	if (!client) {
-		client = new Client(awsConfig);
-	}
-	return client;
 }
 
 /*
@@ -33,21 +26,26 @@ function getClient() {
 */
 export default class LayerDynamo extends Layer {
 
-	static configure(config) {
-		if (!config.tableName) {
+	constructor(options) {
+		super(options);
+
+		if (!this.opt.tableName) {
 			throw new Error("Must provide tableName");
 		}
-		if (!config.awsConfig) {
+		if (!this.opt.tableName) {
 			throw new Error("Must provide awsConfig");
 		}
-		awsConfig = config.awsConfig;
-		tableName = config.tableName;
+	}
 
-		return super.configure(config);
+	getClient() {
+		if (!CLIENT) {
+			CLIENT = new Client(this.opt.awsConfig);
+		}
+		return CLIENT;
 	}
 
 	get() {
-		return getClient()
+		return this.getClient()
 			.getItem(this.makeDDBGetParams(this.key))
 			.then(({Item}) => {
 				if (!Item) {
@@ -63,7 +61,7 @@ export default class LayerDynamo extends Layer {
 	}
 
 	set(val) {
-		return getClient().putItem(this.makeDDBPutParams(this.key, val));
+		return this.getClient().putItem(this.makeDDBPutParams(this.key, val));
 	}
 
 	makeDDBGetParams(key) {
@@ -73,7 +71,7 @@ export default class LayerDynamo extends Layer {
 					S: String(key),
 				},
 			},
-			TableName: tableName,
+			TableName: this.opt.tableName,
 		};
 	}
 
@@ -94,7 +92,7 @@ export default class LayerDynamo extends Layer {
 					BOOL: Boolean(i),
 				},
 			},
-			TableName: tableName,
+			TableName: this.opt.tableName,
 		};
 	}
 }
