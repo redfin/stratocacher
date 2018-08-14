@@ -2,70 +2,99 @@ import Q from "q";
 import {DynamoDB} from "aws-sdk";
 import {Layer} from "stratocacher";
 
+var client, awsConfig, tableName;
+
+class Client {
+	constructor(awsConfig) {
+		const ddbClient = new DynamoDB(awsConfig);
+		this.getItem = Q.nbind(ddbClient.getItem, ddbClient);
+		this.putItem = Q.nbind(ddbClient.putItem, ddbClient);
+	}
+}
+
+function getClient() {
+	if (!client) {
+		client = new Client(awsConfig);
+	}
+	return client;
+}
+
 /*
 	DynamoDB Caching Layer.
 	Uses AWS-SDK Dynamo client: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html
-	Configuration requires a table name, key field name, and value field name corresponding to
-	Dynamo table configuration.
+	Configuration requires a table name corresponding to Dynamo configuration.
+	Your table must look like this:
+
+	field:  type:
+	key     String
+	v       String
+	t       Number
+	i       Boolean
 */
 export default class LayerDynamo extends Layer {
 
 	static configure(config) {
-		super.configure(config);
-
-		if (!config.cacheTableName) {
+		if (!config.tableName) {
 			throw new Error("Must provide tableName");
 		}
-		if (!config.cacheKeyFieldName) {
-			throw new Error("Must provide cacheKeyFieldName");
-		}
-		if (!config.cacheValueFieldName) {
-			throw new Error("Must provide cacheValueFieldName");
-		}
 		if (!config.awsConfig) {
-			throw new Error("Must provide config.awsConfig");
+			throw new Error("Must provide awsConfig");
 		}
+		awsConfig = config.awsConfig;
+		tableName = config.tableName;
 
-		this.cacheTableName = config.cacheTableName;
-		this.cacheKeyFieldName = config.cacheKeyFieldName;
-		this.cacheValueFieldName = config.cacheValueFieldName;
-		this.client = new DynamoDB(config.awsConfig);
-	}
-
-	getClient() {
-		if (!LayerDynamo.client) {
-			throw new Error("AWS-SDK not initialized. Call LayerDynamo#configure before using this layer.")
-		}
-
-		return LayerDynamo.client;
+		return super.configure(config);
 	}
 
 	get() {
-		return Q.nfcall(this.getClient().getItem, this.makeDDBGetParams(this.key))
-			.then(this.load);
+		return getClient()
+			.getItem(this.makeDDBGetParams(this.key))
+			.then(({Item}) => {
+				if (!Item) {
+					throw new Error("Malformed response from dynamoDB for key: " + this.key);
+				}
+				return this.load({
+					key: Item.key.S,
+					v: Item.v.S,
+					t: Number(Item.t.N),
+					i: Item.i.BOOL,
+				});
+			});
 	}
 
 	set(val) {
-		return Q.nfcall(this.getClient().putItem, this.makeDDBPutParams(this.key, this.dump(val)));
+		return getClient().putItem(this.makeDDBPutParams(this.key, val));
 	}
 
 	makeDDBGetParams(key) {
-		const ddbKey = {};
-		ddbKey[LayerDynamo.cacheKeyFieldName] = {S: key};
 		return {
-			Key: ddbKey,
-			TableName: LayerDynamo.cacheTableName,
+			Key: {
+				key: {
+					S: String(key),
+				},
+			},
+			TableName: tableName,
 		};
 	}
 
 	makeDDBPutParams(key, val) {
-		const ddbItem = {};
-		ddbItem[LayerDynamo.cacheKeyFieldName] = {S: key};
-		ddbItem[LayerDynamo.cacheValueFieldName] = {S: val};
-
+		const {v, t, i} = this.dump(val);
 		return {
-			Item: ddbItem,
-			TableName: LayerDynamo.cacheTableName,
+			Item: {
+				key: {
+					S: String(key),
+				},
+				v: {
+					S: String(v),
+				},
+				t: {
+					N: String(t), //Dynamo requires numbers be sent as strings
+				},
+				i: {
+					BOOL: Boolean(i),
+				},
+			},
+			TableName: tableName,
 		};
 	}
 }
