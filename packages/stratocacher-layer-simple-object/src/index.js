@@ -13,8 +13,12 @@ export default class LayerSimpleObject extends Layer {
 		Object.keys(CACHE).forEach(k => delete CACHE[k]);
 	}
 
+	getCache() {
+		return (this.opt.cacheProvider || (() => CACHE))();
+	}
+
 	get() {
-		let val = CACHE[this.key];
+		let val = this.getCache()[this.key];
 		if (this.opt.copy) {
 			val = JSON.parse(val);
 		}
@@ -27,7 +31,7 @@ export default class LayerSimpleObject extends Layer {
 		if (this.opt.copy) {
 			val = JSON.stringify(val);
 		}
-		CACHE[this.key] = val;
+		this.getCache()[this.key] = val;
 		return Q(); // We're synchronous but need to return a promise.
 	}
 }
