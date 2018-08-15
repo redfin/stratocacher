@@ -30,4 +30,19 @@ describe("A LayerSimpleObject instance", () => {
 			done();
 		});
 	});
+
+	it("accepts a cacheProvider in configuration", done => {
+		const obj = { foo: "bar" }
+		const myCache = {};
+		LayerSimpleObject.configure({cacheProvider: () => myCache});
+
+		const layer = new LayerSimpleObject({key: "A"});
+
+		layer.set(obj).then(() => layer.get()).then(() => {
+			expect(myCache).toBeDefined();
+			expect(myCache.A).toBeDefined();
+			expect(myCache.A.v).toEqual(obj);
+			done();
+		}).catch(done);
+	});
 });
