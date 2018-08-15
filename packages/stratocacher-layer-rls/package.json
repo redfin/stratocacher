@@ -1,0 +1,33 @@
+{
+  "name": "stratocacher-layer-rls",
+  "version": "0.0.12",
+  "description": "An RLS cache layer",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redfin/stratocacher.git"
+  },
+  "keywords": [
+    "stratocacher",
+    "cache",
+    "layer"
+  ],
+  "author": "Matt Olson",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/redfin/stratocacher/issues"
+  },
+  "homepage": "https://github.com/redfin/stratocacher#readme",
+  "dependencies": {
+    "q": "^1.4.1",
+    "request-local-storage": "^1.2.0",
+    "stratocacher": "^0.0.12"
+  },
+  "devDependencies": {
+    "mock-require": "^3.0.2"
+  }
+}
