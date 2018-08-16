@@ -14,7 +14,9 @@
   "keywords": [
     "stratocacher",
     "cache",
-    "layer"
+    "layer",
+    "request",
+    "request-local-storage"
   ],
   "author": "Matt Olson",
   "license": "Apache-2.0",
