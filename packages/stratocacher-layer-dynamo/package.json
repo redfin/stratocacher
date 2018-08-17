@@ -15,7 +15,8 @@
         "stratocacher",
         "cache",
         "layer",
-        "lru"
+        "dynamo",
+        "dynamodb"
     ],
     "author": "Matt Olson",
     "license": "Apache-2.0",
