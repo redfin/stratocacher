@@ -2,7 +2,7 @@ import Q from "q";
 import {DynamoDB} from "aws-sdk";
 import {Layer} from "stratocacher";
 
-var CLIENT;
+var CLIENTS = {};
 
 class Client {
 	constructor(awsConfig) {
@@ -37,10 +37,10 @@ export default class LayerDynamo extends Layer {
 	}
 
 	getClient() {
-		if (!CLIENT) {
-			CLIENT = new Client(this.opt.awsConfig);
+		if (!CLIENTS[this.cid]) {
+			CLIENTS[this.cid] = new Client(this.opt.awsConfig);
 		}
-		return CLIENT;
+		return CLIENTS[this.cid];
 	}
 
 	get() {
