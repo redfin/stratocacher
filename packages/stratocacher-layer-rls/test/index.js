@@ -10,6 +10,7 @@ describe("A LayerRLS instance", () => {
 			layer.set(obj).then(() => layer.get()).then(() => {
 				expect(layer.val).toEqual(obj);
 				done();
+
 			});
 		});
 	});
@@ -28,4 +29,33 @@ describe("A LayerRLS instance", () => {
 			});
 		});
 	});
+
+	it("seperates keys across multiple requests", done => {
+		const key = { key: "A" };
+		const obj0 = { foo: "bar" };
+		const obj1 = { foo: "bar" };
+
+		RequestLocalStorage.startRequest(() => {
+			const layer0 = new LayerRLS(key);
+
+			layer0.set(obj0)
+				.then(() => layer0.get())
+				.then(() => {
+					expect(layer0.val).toEqual(obj0);
+
+					RequestLocalStorage.startRequest(() => {
+						const layer1 = new LayerRLS(key);
+						layer1.set(obj1)
+							.then(() => layer0.get())
+							.then(() => layer1.get())
+							.then(() => {
+								expect(layer0.val).toEqual(obj0);
+								expect(layer1.val).toEqual(obj1);
+								done();
+							});
+					});
+				});
+		});
+	});
 });
+
