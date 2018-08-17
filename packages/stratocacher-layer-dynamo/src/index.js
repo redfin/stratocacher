@@ -1,6 +1,6 @@
 import Q from "q";
 import {DynamoDB} from "aws-sdk";
-import {Layer} from "stratocacher";
+import {Layer, events} from "stratocacher";
 
 var CLIENTS = {};
 
@@ -12,6 +12,12 @@ class Client {
 	}
 }
 
+function emitError(message) {
+	events.emit("error", {
+		name: "LayerDynamo",
+		error: new Error(message),
+	});
+}
 /*
 	DynamoDB Caching Layer.
 	Uses AWS-SDK Dynamo client: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html
@@ -29,10 +35,10 @@ export default class LayerDynamo extends Layer {
 	constructor(options) {
 		super(options);
 		if (!this.opt.tableName) {
-			throw new Error("Must provide tableName");
+			emitError("Must provide tableName");
 		}
 		if (!this.opt.awsConfig) {
-			throw new Error("Must provide awsConfig");
+			emitError("Must provide awsConfig");
 		}
 	}
 
@@ -48,7 +54,7 @@ export default class LayerDynamo extends Layer {
 			.getItem(this.makeDDBGetParams(this.key))
 			.then(({Item}) => {
 				if (!Item) {
-					throw new Error("Malformed response from dynamoDB for key: " + this.key);
+					emitError("Malformed response from dynamoDB for key: " + this.key);
 				}
 				return this.load({
 					key: Item.key.S,
