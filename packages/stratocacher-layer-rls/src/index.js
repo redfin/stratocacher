@@ -10,14 +10,25 @@ const RLS = getNamespace();
 export default class LayerRLS extends Layer {
 
 	get() {
-		const val = RLS()[this.key];
+		let val = RLS()[this.key];
+		if (val && this.shouldCopy()) {
+			val = JSON.parse(val);
+		}
 		this.load(val);
 		return Q();
 	}
 
 	set(val) {
 		val = this.dump(val);
+		if (this.shouldCopy()) {
+			val = JSON.stringify(val);
+		}
+
 		RLS()[this.key] = val;
 		return Q();
+	}
+
+	shouldCopy() {
+		return this.opt.copy || !this.opt.hasOwnProperty('copy');
 	}
 }
