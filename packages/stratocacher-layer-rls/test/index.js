@@ -1,5 +1,5 @@
-const RequestLocalStorage = require('request-local-storage');
-const LayerRLS = require("../lib/index.js").default;
+import RequestLocalStorage from "request-local-storage";
+import LayerRLS from "../lib/index.js";
 
 describe("A LayerRLS instance", () => {
 	const obj = { foo: "bar" }
@@ -32,29 +32,30 @@ describe("A LayerRLS instance", () => {
 
 	it("seperates keys across multiple requests", done => {
 		const key = { key: "A" };
-		const obj0 = { foo: "bar" };
-		const obj1 = { foo: "bar" };
+		const obj = { foo: "bar" };
 
-		RequestLocalStorage.startRequest(() => {
-			const layer0 = new LayerRLS(key);
+		setImmediate(() => {
+			RequestLocalStorage.startRequest(() => {
+				let layer = new LayerRLS(key);
+				layer.set(obj);
+				layer.get();
+				expect(layer.val).toEqual(obj);
+				//A new instance with the same key returns obj.
+				layer = new LayerRLS(key);
+				layer.get();
+				expect(layer.val).toEqual(obj);
+			});
+		});
 
-			layer0.set(obj0)
-				.then(() => layer0.get())
-				.then(() => {
-					expect(layer0.val).toEqual(obj0);
-
-					RequestLocalStorage.startRequest(() => {
-						const layer1 = new LayerRLS(key);
-						layer1.set(obj1)
-							.then(() => layer0.get())
-							.then(() => layer1.get())
-							.then(() => {
-								expect(layer0.val).toEqual(obj0);
-								expect(layer1.val).toEqual(obj1);
-								done();
-							});
-					});
-				});
+		setImmediate(() => {
+			RequestLocalStorage.startRequest(() => {
+				//A new instance with the same key does not return obj
+				//this time, because it is scoped to a different request.
+				const layer = new LayerRLS(key);
+				layer.get();
+				expect(layer.val).toBeUndefined();
+				done();
+			});
 		});
 	});
 });
