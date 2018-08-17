@@ -1,7 +1,7 @@
 {
   "name": "stratocacher-layer-rls",
   "version": "0.0.12",
-  "description": "An RLS cache layer",
+  "description": "A cache layer using request-local-storage",
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp prepublish",
