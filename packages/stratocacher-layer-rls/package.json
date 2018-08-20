@@ -1,6 +1,6 @@
 {
   "name": "stratocacher-layer-rls",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "A cache layer using request-local-storage",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
   "dependencies": {
     "q": "^1.4.1",
     "request-local-storage": "^1.2.0",
-    "stratocacher": "^0.0.12"
+    "stratocacher": "^0.1.0"
   },
   "devDependencies": {
     "mock-require": "^3.0.2"
