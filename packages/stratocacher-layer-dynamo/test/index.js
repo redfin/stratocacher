@@ -6,7 +6,8 @@ function DynamoDB() {
 	this.getItem = (params, cb) => {
 		const key = params.Key.key.S;
 		const tableName = params.TableName;
-		cb({Item: cache[tableName][key]});
+		const Item = cache[tableName] && cache[tableName][key];
+		cb(Item ? {Item} : undefined);
 	}
 
 	this.putItem = (params, cb) => {
@@ -22,7 +23,7 @@ function DynamoDB() {
 mockRequire("aws-sdk", {DynamoDB});
 
 describe("A LayerDynamo instance", () => {
-	const obj = "xxxx";
+	const obj = {foo: "bar"};
 	var LayerDynamo;
 
 	beforeAll(() => {
@@ -42,6 +43,34 @@ describe("A LayerDynamo instance", () => {
 
 		layer.set(obj).then(() => layer.get()).then(() => {
 			expect(layer.val).toEqual(obj);
+			done();
+		}).catch(done);
+	});
+
+	it("returns undefined for a cache miss", done => {
+		const layer = new LayerDynamo({key: "A"});
+
+		layer.get().then(() => {
+			expect(layer.val).toBeUndefined();
+			done();
+		}).catch(done);
+	});
+
+	it("can be configured to not parse JSON", done => {
+		LayerDynamo.configure({
+			json: false,
+			tableName: "cache",
+			awsConfig: {
+				accessKeyId: "xxxx",
+				secretAccessKey: "xxxx",
+				region: "us-west-2",
+			},
+		});
+
+		const layer = new LayerDynamo({key: "A"});
+
+		layer.set(obj).get().then(() => {
+			expect(layer.val).toEqual("[object Object]");
 			done();
 		}).catch(done);
 	});

@@ -42,6 +42,13 @@ export default class LayerDynamo extends Layer {
 		}
 	}
 
+	parseValue(val) {
+		if (this.opt.json === false) {
+			return val;
+		}
+		return JSON.parse(val);
+	}
+
 	getClient() {
 		if (!CLIENTS[this.cid]) {
 			CLIENTS[this.cid] = new Client(this.opt.awsConfig);
@@ -52,16 +59,18 @@ export default class LayerDynamo extends Layer {
 	get() {
 		return this.getClient()
 			.getItem(this.makeDDBGetParams(this.key))
-			.then(({Item}) => {
-				if (!Item) {
-					emitError("Malformed response from dynamoDB for key: " + this.key);
+			.then((response) => {
+				if (response && response.Item) {
+
+					const {Item} = response;
+
+					this.load({
+						key: Item.key.S,
+						v: this.parseValue(Item.v.S),
+						t: Number(Item.t.N),
+						i: Item.i.BOOL,
+					});
 				}
-				return this.load({
-					key: Item.key.S,
-					v: Item.v.S,
-					t: Number(Item.t.N),
-					i: Item.i.BOOL,
-				});
 			});
 	}
 
@@ -88,7 +97,7 @@ export default class LayerDynamo extends Layer {
 					S: String(key),
 				},
 				v: {
-					S: String(v),
+					S: this.opt.json === false ? String(v) : JSON.stringify(v),
 				},
 				t: {
 					N: String(t), //Dynamo requires numbers be sent as strings
