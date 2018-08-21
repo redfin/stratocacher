@@ -1,4 +1,5 @@
 import Q from "q";
+import lzutf8 from "lzutf8";
 import {DynamoDB} from "aws-sdk";
 import {Layer, events} from "stratocacher";
 
@@ -29,6 +30,13 @@ function emitError(message) {
 	v       String
 	t       Number
 	i       Boolean
+	c       Boolean
+
+	Config options:
+	tableName: The name of your DynamoDB table
+	awsConfig: aws-sdk config.
+	json: treat values as JSON. (default = true)
+	compress: compress values (default = false)
 */
 export default class LayerDynamo extends Layer {
 
@@ -41,14 +49,6 @@ export default class LayerDynamo extends Layer {
 			emitError("Must provide awsConfig");
 		}
 	}
-
-	parseValue(val) {
-		if (this.opt.json === false) {
-			return val;
-		}
-		return JSON.parse(val);
-	}
-
 	getClient() {
 		if (!CLIENTS[this.cid]) {
 			CLIENTS[this.cid] = new Client(this.opt.awsConfig);
@@ -60,13 +60,14 @@ export default class LayerDynamo extends Layer {
 		return this.getClient()
 			.getItem(this.makeDDBGetParams(this.key))
 			.then((response) => {
+
 				if (response && response.Item) {
 
 					const {Item} = response;
-
+					const v = this.parseValue(Item);
 					this.load({
 						key: Item.key.S,
-						v: this.parseValue(Item.v.S),
+						v: v,
 						t: Number(Item.t.N),
 						i: Item.i.BOOL,
 					});
@@ -75,7 +76,8 @@ export default class LayerDynamo extends Layer {
 	}
 
 	set(val) {
-		return this.getClient().putItem(this.makeDDBPutParams(this.key, val));
+		return this.getClient()
+			.putItem(this.makeDDBPutParams(this.key, val));
 	}
 
 	makeDDBGetParams(key) {
@@ -93,11 +95,9 @@ export default class LayerDynamo extends Layer {
 		const {v, t, i} = this.dump(val);
 		return {
 			Item: {
+				v: this.makeValue(v),
 				key: {
 					S: String(key),
-				},
-				v: {
-					S: this.opt.json === false ? String(v) : JSON.stringify(v),
 				},
 				t: {
 					N: String(t), //Dynamo requires numbers be sent as strings
@@ -105,8 +105,65 @@ export default class LayerDynamo extends Layer {
 				i: {
 					BOOL: Boolean(i),
 				},
+				c: {
+					BOOL: Boolean(this.opt.compress),
+				},
+				json: {
+					BOOL: Boolean(this.opt.json !== false),
+				},
 			},
 			TableName: this.opt.tableName,
 		};
 	}
+
+	/*
+		returns a typed value: {<type toke>: value},
+		If opt.json is false, coerced val to string,
+		otherwise uses JSON.stringify.
+		If opt.compress is true, compresses value and
+		uses type binary, otherwise stores val as a string.
+	*/
+	makeValue(v) {
+		if (this.opt.json !== false) {
+			v = JSON.stringify(v);
+		} else {
+			v = String(v);
+		}
+
+		const typedV = {};
+
+		if (this.opt.compress) {
+			typedV.B = lzutf8.compress(v); //B token means "binary"
+		}
+		else {
+			typedV.S = v; //S token means "string"
+		}
+
+		return typedV;
+	}
+
+	parseValue({v, c, json}) {
+
+		if (c && c.BOOL) { // c flag tells us this value is compressed
+			if (!v.B) {
+				// v.B had better exist, otherwise something went wrong with set.
+				emitError("Compression flag (c) was set, but v.B is undefined for key: " + this.key);
+				return undefined;
+			}
+			v = lzutf8.decompress(v.B);
+		} else {
+			if (!v.S) {
+				emitError("Compression flag (c) was not set, but v.S is undefined for key: " + this.key);
+				return undefined;
+			}
+			v = v.S;
+		}
+
+		if (json && json.BOOL) {
+			v = JSON.parse(v);
+		}
+
+		return v;
+	}
+
 }
