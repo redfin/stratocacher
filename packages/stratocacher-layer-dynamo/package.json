@@ -1,6 +1,6 @@
 {
     "name": "stratocacher-layer-dynamo",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A dynamo db stratocacher layer",
     "main": "index.js",
     "scripts": {
