@@ -9,6 +9,8 @@ describe("A LayerSimpleObject instance", () => {
 	it("stashes references by default", done => {
 		const obj = { foo: "bar" }
 
+		LayerSimpleObject.configure({});
+
 		const layer = new LayerSimpleObject({key: "A"});
 
 		layer.set(obj).then(() => layer.get()).then(() => {
