@@ -35,7 +35,6 @@ function emitError(message) {
 	Config options:
 	tableName: The name of your DynamoDB table
 	awsConfig: aws-sdk config.
-	json: treat values as JSON. (default = true)
 	compress: compress values (default = false)
 */
 export default class LayerDynamo extends Layer {
@@ -108,9 +107,6 @@ export default class LayerDynamo extends Layer {
 				c: {
 					BOOL: Boolean(this.opt.compress),
 				},
-				json: {
-					BOOL: Boolean(this.opt.json !== false),
-				},
 			},
 			TableName: this.opt.tableName,
 		};
@@ -118,17 +114,11 @@ export default class LayerDynamo extends Layer {
 
 	/*
 		returns a typed value: {<type toke>: value},
-		If opt.json is false, coerced val to string,
-		otherwise uses JSON.stringify.
 		If opt.compress is true, compresses value and
 		uses type binary, otherwise stores val as a string.
 	*/
 	makeValue(v) {
-		if (this.opt.json !== false) {
-			v = JSON.stringify(v);
-		} else {
-			v = String(v);
-		}
+		v = JSON.stringify(v);
 
 		const typedV = {};
 
@@ -142,7 +132,7 @@ export default class LayerDynamo extends Layer {
 		return typedV;
 	}
 
-	parseValue({v, c, json}) {
+	parseValue({v, c}) {
 
 		if (c && c.BOOL) { // c flag tells us this value is compressed
 			if (!v.B) {
@@ -159,11 +149,7 @@ export default class LayerDynamo extends Layer {
 			v = v.S;
 		}
 
-		if (json && json.BOOL) {
-			v = JSON.parse(v);
-		}
-
-		return v;
+		return JSON.parse(v);
 	}
 
 }
