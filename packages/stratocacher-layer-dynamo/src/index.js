@@ -3,7 +3,7 @@ import lzutf8 from "lzutf8";
 import {DynamoDB} from "aws-sdk";
 import {Layer, events} from "stratocacher";
 
-var CLIENTS = {};
+var CLIENTS = {}, DEFAULT_TIMEOUT = 3000;
 
 class Client {
 	constructor(awsConfig) {
@@ -25,17 +25,18 @@ function emitError(message) {
 	Configuration requires a table name corresponding to Dynamo configuration.
 	Your table must look like this:
 
-	field:  type:
-	key     String
-	v       String
-	t       Number
-	i       Boolean
-	c       Boolean
+	Field:  Type:     Description:
+	key     String    DynamoDB Key
+	v       String    Value
+	t       Number    Time created
+	i       Boolean   Invalidation flag
+	c       Boolean   Compression flag
 
 	Config options:
-	tableName: The name of your DynamoDB table
-	awsConfig: aws-sdk config.
-	compress: compress values (default = false)
+	tableName      : The name of your DynamoDB table.
+	awsConfig      : aws-sdk config.
+	compress       : Compress values (default = false)
+	requestTimeout : Timeout for requests to Dynamo (default = 3s)
 */
 export default class LayerDynamo extends Layer {
 
@@ -58,6 +59,7 @@ export default class LayerDynamo extends Layer {
 	get() {
 		return this.getClient()
 			.getItem(this.makeDDBGetParams(this.key))
+			.timeout(this.opt.requestTimeout || DEFAULT_TIMEOUT)
 			.then((response) => {
 
 				if (response && response.Item) {
@@ -76,7 +78,8 @@ export default class LayerDynamo extends Layer {
 
 	set(val) {
 		return this.getClient()
-			.putItem(this.makeDDBPutParams(this.key, val));
+			.putItem(this.makeDDBPutParams(this.key, val))
+			.timeout(this.opt.requestTimeout || DEFAULT_TIMEOUT);
 	}
 
 	makeDDBGetParams(key) {

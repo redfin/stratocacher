@@ -3,14 +3,28 @@ import mockRequire from "mock-require";
 
 let cache = {};
 
+function getConfig(overrides) {
+	return Object.assign({
+		tableName: "cache",
+		awsConfig: {
+			accessKeyId: "xxxxx",
+			secretAccessKey: "xxxx",
+			region: "us-west-2",
+		},
+	}, overrides);
+}
+
 //Dynamo client mock
 function DynamoDB() {
 	this.getItem = (params, cb) => {
 		try {
 			const key = params.Key.key.S;
 			const tableName = params.TableName;
-			const Item = cache[tableName] && cache[tableName][key];
-			cb(undefined, Item ? {Item} : undefined);
+
+			if (cache[tableName]) {
+				const Item = cache[tableName] && cache[tableName][key];
+				cb(undefined, Item ? {Item} : undefined);
+			}
 		} catch (e) {
 			cb(e);
 		}
@@ -20,10 +34,10 @@ function DynamoDB() {
 		try {
 			const key = params.Item.key.S;
 			const tableName = params.TableName;
-
-			if (!cache[tableName]) cache[tableName] = {};
-			cache[tableName][key] = params.Item
-			cb();
+			if (cache[tableName]) {
+				cache[tableName][key] = params.Item;
+				cb();
+			}
 		} catch (e) {
 			cb(e);
 		}
@@ -38,18 +52,12 @@ describe("A LayerDynamo instance", () => {
 
 	beforeAll(() => {
 		LayerDynamo = require("../lib/index.js").default;
-		LayerDynamo.configure({
-			tableName: "cache",
-			awsConfig: {
-				accessKeyId: "xxxx",
-				secretAccessKey: "xxxx",
-				region: "us-west-2",
-			},
-		});
+		LayerDynamo.configure(getConfig());
 	});
 
 	beforeEach(() => {
-		cache = {}
+		cache = {"cache": {}};
+		LayerDynamo.configure(getConfig());
 	})
 
 	it("sets and gets a value", done => {
@@ -75,38 +83,9 @@ describe("A LayerDynamo instance", () => {
 			.catch(e => done.fail(e));
 	});
 
-	it("can be configured to not parse JSON", done => {
-		LayerDynamo.configure({
-			json: false,
-			tableName: "cache",
-			awsConfig: {
-				accessKeyId: "xxxx",
-				secretAccessKey: "xxx",
-				region: "us-west-2",
-			},
-		});
-
-		const layer = new LayerDynamo({key: "A"});
-
-		layer.set(obj)
-			.then(() => layer.get())
-			.then(() => {
-				expect(layer.val).toEqual("[object Object]");
-				done();
-			})
-			.catch(e => done.fail(e));
-	});
-
 	it("can be configured to use compression", done => {
-		LayerDynamo.configure({
-			compress: true,
-			tableName: "cache",
-			awsConfig: {
-				accessKeyId: "xxx",
-				secretAccessKey: "xxx",
-				region: "us-west-2",
-			},
-		});
+
+		LayerDynamo.configure(getConfig({compress: true}));
 
 		const layer = new LayerDynamo({key: "A"});
 
@@ -120,4 +99,37 @@ describe("A LayerDynamo instance", () => {
 			.catch(e => done.fail(e));
 	});
 
+	it("throws an error if set operation times out", done => {
+
+		LayerDynamo.configure(getConfig({
+			tableName: "non-existent",
+			requestTimeout: 200,
+		}));
+
+		const layer = new LayerDynamo({key: "A"});
+
+		layer.set(obj)
+			.then(() => done.fail("Operation should have timed out."))
+			.catch(e => {
+				expect(e.message).toEqual("Timed out after 200 ms");
+				done();
+			});
+	});
+
+	it("throws an error if get operation times out", done => {
+
+		LayerDynamo.configure(getConfig({
+			tableName: "non-existent",
+			requestTimeout: 200,
+		}));
+
+		const layer = new LayerDynamo({key: "A"});
+
+		layer.get(obj)
+			.then(() => done.fail("Operation should have timed out."))
+			.catch(e => {
+				expect(e.message).toEqual("Timed out after 200 ms");
+				done();
+			});
+	});
 });
