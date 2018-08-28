@@ -132,4 +132,30 @@ describe("A LayerDynamo instance", () => {
 				done();
 			});
 	});
+
+	it("sets ttl correctly", done => {
+		const ttl = 3000;
+		const layer = new LayerDynamo({key: "A", ttl});
+
+		layer.set(obj)
+			.then(() => layer.get())
+			.then(() => {
+				expect(cache.cache.A.ttl.N).toBeGreaterThan(Date.now() / 1000);
+				expect(cache.cache.A.ttl.N).toBeLessThan((Date.now() + ttl)  / 1000);
+				done();
+			})
+			.catch(e => done.fail(e));
+	});
+
+	it("does not set ttl if no ttl is provided", done => {
+		const layer = new LayerDynamo({key: "A"});
+
+		layer.set(obj)
+			.then(() => layer.get())
+			.then(() => {
+				expect(cache.cache.A.ttl).toBeUndefined();
+				done();
+			})
+			.catch(e => done.fail(e));
+	});
 });
