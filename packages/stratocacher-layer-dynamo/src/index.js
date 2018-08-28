@@ -21,16 +21,27 @@ function emitError(message) {
 }
 /*
 	DynamoDB Caching Layer.
-	Uses AWS-SDK Dynamo client: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html
-	Configuration requires a table name corresponding to Dynamo configuration.
-	Your table must look like this:
+	Uses AWS-SDK Dynamo client:
+	https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html
+
+	Configuration notes:
+
+	1. You must provide a tableName parameter that corresponds to the name
+	of your DynamoDB table.
+
+	2. You must configure your Dynamo table to respect the ttl field,
+	otherwise Dynamo will not evict expired entries. See:
+	https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html
+
+	Once populated, your Dynamo table will look like this:
 
 	Field:  Type:     Description:
-	key     String    DynamoDB Key
-	v       String    Value
-	t       Number    Time created
-	i       Boolean   Invalidation flag
 	c       Boolean   Compression flag
+	i       Boolean   Invalidation flag
+	key     String    DynamoDB Key
+	t       Number    Time created
+	ttl     Number    Time to live
+	v       String    Value
 
 	Config options:
 	tableName      : The name of your DynamoDB table.
@@ -94,25 +105,32 @@ export default class LayerDynamo extends Layer {
 	}
 
 	makeDDBPutParams(key, val) {
+
 		const {v, t, i} = this.dump(val);
-		return {
-			Item: {
-				v: this.makeValue(v),
-				key: {
-					S: String(key),
-				},
-				t: {
-					N: String(t), //Dynamo requires numbers be sent as strings
-				},
-				i: {
-					BOOL: Boolean(i),
-				},
-				c: {
-					BOOL: Boolean(this.opt.compress),
-				},
+		const TableName = this.opt.tableName;
+		const Item = {
+			v: this.makeValue(v),
+			key: {
+				S: String(key),
 			},
-			TableName: this.opt.tableName,
-		};
+			t: {
+				N: String(t), //Dynamo requires numbers be sent as strings
+			},
+			i: {
+				BOOL: Boolean(i),
+			},
+			c: {
+				BOOL: Boolean(this.opt.compress),
+			},
+		}
+
+		if (this.ttl) {
+			Item.ttl = {
+				N: String(Math.floor((this.ttl + t) / 1000)),
+			}
+		}
+
+		return {Item, TableName};
 	}
 
 	/*
