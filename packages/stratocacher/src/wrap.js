@@ -39,12 +39,13 @@ export default function wrap(opts, func){
 
 	const {
 		name,
-		ttl     = DEFAULT_TTL,
-		ttr     = ttl * DEFAULT_TTR_RATIO,
-		layers  = [],
-		before  = _ => Q(_),   // Munge arguments.
-		after   = _ => Q(_),   // Munge response.
-		force   = () => false, // Force a miss.
+		ttl         = DEFAULT_TTL,
+		ttr         = ttl * DEFAULT_TTR_RATIO,
+		layers      = [],
+		before      = _ => Q(_),   // Munge arguments.
+		shouldCache = () => true,  // Should we cache the response from func?
+		after       = _ => Q(_),   // Munge response.
+		force       = () => false, // Force a miss.
 	} = opts;
 
 	const time = (type, time) => events.emit('time', {type, name, time});
@@ -71,6 +72,18 @@ export default function wrap(opts, func){
 					time('build', new Date - _t1);
 					return val;
 				});
+		}
+
+		const set = (layers, val) => {
+
+			if (!shouldCache(val)) return;
+
+			if (Array.isArray(layers)) {
+				layers.forEach(layer => layer.set(val));
+			}
+			else {
+				layers.set(val);
+			}
 		}
 
 		const pump = () => {
@@ -115,10 +128,8 @@ export default function wrap(opts, func){
 					// populate the new value into all
 					// layers.
 					if (cur.red) {
-						bld().then(val => {
-							fix.forEach(l => {
-								l.set(val);
-							});
+						bld().then((val) => {
+							set(fix, val);
 						}).catch(() => {
 							time('error.background', new Date - _t0);
 						});
@@ -128,7 +139,7 @@ export default function wrap(opts, func){
 
 					// Miss.  Populate this layer later
 					// when we get a value.
-					ret.promise.then(val => cur.set(val));
+					ret.promise.then(val => set(cur, val));
 
 					time(`layer.${cur.name()}.miss.fromStart`,  new Date - _t0);
 					time(`layer.${cur.name()}.miss.individual`, new Date - _t1);

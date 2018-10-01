@@ -2,7 +2,8 @@ import Layer from "../layer-class";
 import Q     from "q";
 import _     from "lodash";
 
-const CACHE = {};
+export const CACHE = {};
+
 export default class LayerTestObject extends Layer {
 	static reset() {
 		_.forEach(CACHE, (v, k) => delete CACHE[k])
