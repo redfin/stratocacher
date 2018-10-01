@@ -74,15 +74,9 @@ export default function wrap(opts, func){
 				});
 		}
 
-		const set = (layers, val) => {
-
-			if (!shouldCache(val)) return;
-
-			if (Array.isArray(layers)) {
-				layers.forEach(layer => layer.set(val));
-			}
-			else {
-				layers.set(val);
+		const set = (layer, val) => {
+			if (shouldCache(val)) {
+				layer.set(val);
 			}
 		}
 
@@ -129,7 +123,7 @@ export default function wrap(opts, func){
 					// layers.
 					if (cur.red) {
 						bld().then((val) => {
-							set(fix, val);
+							fix.forEach(layer => set(layer, val));
 						}).catch(() => {
 							time('error.background', new Date - _t0);
 						});
