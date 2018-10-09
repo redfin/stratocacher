@@ -43,7 +43,7 @@ export default function wrap(opts, func){
 		ttr         = ttl * DEFAULT_TTR_RATIO,
 		layers      = [],
 		before      = _ => Q(_),   // Munge arguments.
-		shouldCache = () => true,  // Should we cache the response from func?
+		transform   = _ => _,      // Transform response from func. undefined won't be cached.
 		after       = _ => Q(_),   // Munge response.
 		force       = () => false, // Force a miss.
 	} = opts;
@@ -75,8 +75,9 @@ export default function wrap(opts, func){
 		}
 
 		const set = (layer, val) => {
-			if (shouldCache(val)) {
-				layer.set(val);
+			const transformed = transform(val);
+			if (typeof transformed !== 'undefined') {
+				layer.set(transformed);
 			}
 		}
 

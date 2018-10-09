@@ -48,21 +48,21 @@ describe("An unwrapped function", () => {
 
 	});
 
-	it("accepts a shouldCache hook", done => {
-		let i = 0;
+	it("accepts a transform hook", done => {
+		const data0 = {foo: 0, bar: 1};
 		const handler = jasmine.createSpy('handler');
-		const shouldCache = jasmine.createSpy('shouldCache');
+		const transform = jasmine.createSpy('transform');
 		events.on('time', handler);
 
 		const A = wrap({
 			ttl         : ONE_HOUR,
 			layers      : [LayerTestObject],
-			shouldCache : (val) => {
-				shouldCache();
-				return val !== 1;
+			transform : (val) => {
+				transform();
+				return val.foo === 1 ? undefined : Object.assign(val, {baz: 2});
 			},
 		}, function A() {
-			return ++i;
+			return Object.assign(data0, {foo: ++data0.foo});
 		})
 
 		// No arguments.
@@ -70,16 +70,16 @@ describe("An unwrapped function", () => {
 
 		Q()
 			.then(get)
-			.then(v => expect(v).toBe(1))
+			.then(v => expect(v).toBe(data0))
 			.then(() => expect(handler).toHaveBeenCalled())
-			.then(() => expect(shouldCache).toHaveBeenCalled())
+			.then(() => expect(transform).toHaveBeenCalled())
 			.then(() => expect(Object.keys(CACHE).length).toBe(0))
 			.then(() => handler.calls.reset())
 			.then(get)
-			.then(v => expect(v).toBe(2))
-			.then(() => expect(CACHE['0_A_0'].v).toBe(2))
+			.then(v => expect(v.foo).toBe(2) && expect(v.baz).toBe(2))
+			.then(() => expect(CACHE['0_A_0'].v.baz).toBe(2))
 			.then(() => expect(handler).toHaveBeenCalled())
-			.then(() => expect(shouldCache).toHaveBeenCalled())
+			.then(() => expect(transform).toHaveBeenCalled())
 			.then(done);
 	});
 
