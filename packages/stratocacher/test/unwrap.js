@@ -48,17 +48,17 @@ describe("An unwrapped function", () => {
 
 	});
 
-	it("accepts a transform hook", done => {
+	it("accepts a preCache hook", done => {
 		const data0 = {foo: 0, bar: 1};
 		const handler = jasmine.createSpy('handler');
-		const transform = jasmine.createSpy('transform');
+		const preCache = jasmine.createSpy('preCache');
 		events.on('time', handler);
 
 		const A = wrap({
 			ttl         : ONE_HOUR,
 			layers      : [LayerTestObject],
-			transform : (val) => {
-				transform();
+			preCache : (val) => {
+				preCache();
 				return val.foo === 1 ? undefined : Object.assign(val, {baz: 2});
 			},
 		}, function A() {
@@ -72,14 +72,14 @@ describe("An unwrapped function", () => {
 			.then(get)
 			.then(v => expect(v).toBe(data0))
 			.then(() => expect(handler).toHaveBeenCalled())
-			.then(() => expect(transform).toHaveBeenCalled())
+			.then(() => expect(preCache).toHaveBeenCalled())
 			.then(() => expect(Object.keys(CACHE).length).toBe(0))
 			.then(() => handler.calls.reset())
 			.then(get)
 			.then(v => expect(v.foo).toBe(2) && expect(v.baz).toBe(2))
 			.then(() => expect(CACHE['0_A_0'].v.baz).toBe(2))
 			.then(() => expect(handler).toHaveBeenCalled())
-			.then(() => expect(transform).toHaveBeenCalled())
+			.then(() => expect(preCache).toHaveBeenCalled())
 			.then(done);
 	});
 
