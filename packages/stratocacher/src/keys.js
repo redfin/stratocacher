@@ -23,5 +23,5 @@ export function makeKey({
 			return null;
 		}
 	}
-	return pieces.join('_');
+	return JSON.stringify(pieces);
 }
