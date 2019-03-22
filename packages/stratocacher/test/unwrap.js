@@ -77,7 +77,7 @@ describe("An unwrapped function", () => {
 			.then(() => handler.calls.reset())
 			.then(get)
 			.then(v => expect(v).toBe(2))
-			.then(() => expect(CACHE['0_A_0'].v).toBe(2))
+			.then(() => expect(CACHE['[0,"A",0]'].v).toBe(2))
 			.then(() => expect(handler).toHaveBeenCalled())
 			.then(() => expect(shouldCache).toHaveBeenCalled())
 			.then(done);
